@@ -1,23 +1,22 @@
 const express = require("express");
+const {adminAuth,userAuth}=require('./middleWare/Auth')
+
 const app = express();
 const port = 7777
 
-app.get('/user',(req,res,next)=>{
-     console.log("1 Router")
-     next()
-    //  res.send("This is 1 Response")
-},
-(req,res,next)=>{
-   console.log("2 Route")
-   next()
-//    res.send("This is a second Response")
- 
+app.use('/admin',adminAuth)
 
-},(req,res,next)=>{
-    console.log("3 Route")
-    res.send("This is a 3 Response")
- 
- })
+app.get('/user',userAuth,function(req,res){
+     res.send("user data send")
+})
+
+app.get('/admin/getAllData',(req,res)=>{
+        res.send("All Data Sent");    
+})
+
+app.get('/admin/deleteUser',(req,res)=>{
+        res.send("Delete User Account");  
+})
 
 app.listen(port,()=>{
     console.log(`app listening on port ${port}`)
