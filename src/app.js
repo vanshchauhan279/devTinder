@@ -4,15 +4,12 @@ const User= require('./models/user')
 const app = express();
 const port = 7777
 
+app.use(express.json())
+
 app.post('/signup', async(req,res)=>{
 
     try{
-        const user=await User.create({
-            firstName: "Bhanu",
-            lastName: "Chauhan",
-            email: "chauhan@bhanu.com",
-            password: "1811"
-          })
+        const user=await User.create(req.body)
        
           res.send("user is added in the system")
     }
