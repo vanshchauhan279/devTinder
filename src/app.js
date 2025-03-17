@@ -18,6 +18,27 @@ app.post('/signup', async(req,res)=>{
     }
 })
 
+app.get('/feed',async(req,res)=>{
+     try{
+        const users= await User.find({})
+        res.json(users)
+     }
+     catch(err){
+        res.status(404).send("something went wrong");
+     }
+})
+
+app.get('/user',async (req,res)=>{
+    try{
+         const emailId =await req.body.email
+         const user = await User.find({email: emailId})
+         res.json(user)
+    }
+    catch(err){
+        res.send("Something Went wrong")
+    }
+})
+
 connectDb()
     .then(()=>{
         console.log("Database connection established");
