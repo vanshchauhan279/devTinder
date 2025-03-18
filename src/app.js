@@ -4,7 +4,7 @@ const User= require('./models/user')
 const app = express();
 const port = 7777
 
-app.use(express.json())
+app.use(express.json()) //enable json parsing, without this req.body gives undefined
 
 app.post('/signup', async(req,res)=>{
 
@@ -37,6 +37,52 @@ app.get('/user',async (req,res)=>{
     catch(err){
         res.send("Something Went wrong")
     }
+})
+
+app.delete('/user',async(req,res)=>{
+    try{
+        const userId = await req.body.userId
+        await User.findByIdAndDelete(userId)
+        res.send("User is successfully deleted")
+    }
+    catch(err){
+         res.status(404).send("something went wrong")
+    }
+})
+
+//delete the documents that matches the condition
+app.delete('/user/byEmail',async (req,res)=>{
+     try{
+         
+        const email = await req.body.email
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+        const result=await User.deleteOne({email: email})
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+         res.send("User deleted successfully by email")
+
+     }
+     catch(err){
+        res.status(404).send("something went wrong")
+   }
+})
+
+app.patch('/user', async(req,res)=>{
+    try{
+        const userId = await req.body.userId;
+        const updateData = await req.body;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        await User.findByIdAndUpdate(userId,updateData) 
+        res.send("user is updated ")
+    }
+    catch(err){
+        res.status(404).send("something went wrong")
+   }
 })
 
 connectDb()
