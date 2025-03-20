@@ -1,5 +1,5 @@
 const express = require("express");
-const connectDb=require("./config/database")
+const connectDb= require("./config/database")
 const User= require('./models/user')
 const app = express();
 const port = 7777
@@ -7,15 +7,24 @@ const port = 7777
 app.use(express.json()) //enable json parsing, without this req.body gives undefined
 
 app.post('/signup', async(req,res)=>{
-
     try{
+        if(req.body.firstName.length < 4){
+            return res.send("Name should be atleast 4 length")
+         }
+         if (!req.body.email) {
+            return res.status(400).json({ message: "Email is required" }); // Stops request here
+        }
+
         const user=await User.create(req.body)
-       
           res.send("user is added in the system")
     }
     catch(err){
-        res.status(500).send("Something went wrong")
-    }
+
+        if (err.code === 11000) {
+            return res.status(400).json({ error: "Email already exists. Please use a different email." });
+        }
+        res.status(500).send(err.message);
+    } 
 })
 
 app.get('/feed',async(req,res)=>{
@@ -77,11 +86,11 @@ app.patch('/user', async(req,res)=>{
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
-        await User.findByIdAndUpdate(userId,updateData) 
+        await User.findByIdAndUpdate(userId,updateData,{runValidators: true}) 
         res.send("user is updated ")
     }
     catch(err){
-        res.status(404).send("something went wrong")
+        res.status(404).send(err.message)
    }
 })
 
