@@ -79,10 +79,28 @@ app.delete('/user/byEmail',async (req,res)=>{
    }
 })
 
-app.patch('/user', async(req,res)=>{
+app.patch('/user/:userId', async(req,res)=>{
+   
     try{
-        const userId = await req.body.userId;
+        const userId = await req.params.userId;
         const updateData = await req.body;
+
+        const updateAllowed = ["gender","password","skills"];
+        
+        const isUpdateAllowed = Object.keys(updateData).every((k)=>{
+            return(updateAllowed.includes(k))
+              
+        })
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed")
+        }
+
+        if(updateData.skills.length > 4){
+            throw new Error("skills should be more than 4")
+        }
+
+
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }

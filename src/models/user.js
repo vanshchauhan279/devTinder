@@ -23,7 +23,12 @@ const userSchema = new Schema({
         required: true
     },
     skills:{
-        type: [String]
+        type: [String],
+        validate: {
+             validator: function(arr){
+                return arr.length >=0 && arr.length<=4;
+             }
+        }
     },
     gender:{
         type: String,
