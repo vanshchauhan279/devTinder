@@ -34,6 +34,29 @@ app.post('/signup', async(req,res)=>{
     } 
 })
 
+app.post("/login", async(req,res)=>{
+    try{
+         const {email, password} = req.body;
+
+         const user = await User.findOne({email: email})
+         if(!user){
+            throw new Error("Invalid Credentials")
+         }
+         
+         const validPassword =await bcrypt.compare(password, user.password);
+         if(validPassword){
+            res.send("Login Successfully")
+         }
+         else{
+            throw new Error("Invalid Credentials")
+         }
+
+    }
+    catch(err){
+        res.status(404).send(err.message)
+    }
+})
+
 app.get('/feed',async(req,res)=>{
      try{
         const users= await User.find({})
