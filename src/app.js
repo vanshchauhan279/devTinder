@@ -1,5 +1,7 @@
 const express = require("express");
 const connectDb= require("./config/database")
+const Validation = require("./utils/Validation")
+const bcrypt = require('bcrypt');
 const User= require('./models/user')
 const app = express();
 const port = 7777
@@ -8,15 +10,20 @@ app.use(express.json()) //enable json parsing, without this req.body gives undef
 
 app.post('/signup', async(req,res)=>{
     try{
-        if(req.body.firstName.length < 4){
-            return res.send("Name should be atleast 4 length")
-         }
-         if (!req.body.email) {
-            return res.status(400).json({ message: "Email is required" }); // Stops request here
-        }
+          Validation(req);
 
-        const user=await User.create(req.body)
-          res.send("user is added in the system")
+          const {firstName,lastName,email,password}= req.body;
+
+          const passwordHash=await bcrypt.hash(password, 10);
+
+          const user=await User.create({
+            firstName,
+            lastName,
+            email,
+            password: passwordHash
+          })
+
+          res.send("user is successfully added")
     }
     catch(err){
 
