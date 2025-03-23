@@ -1,12 +1,15 @@
 const express = require("express");
 const connectDb= require("./config/database")
 const Validation = require("./utils/Validation")
+const cookieParser = require('cookie-parser')   
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User= require('./models/user')
 const app = express();
 const port = 7777
 
 app.use(express.json()) //enable json parsing, without this req.body gives undefined
+app.use(cookieParser())
 
 app.post('/signup', async(req,res)=>{
     try{
@@ -44,7 +47,10 @@ app.post("/login", async(req,res)=>{
          }
          
          const validPassword =await bcrypt.compare(password, user.password);
-         if(validPassword){
+
+         if(validPassword){   
+            var token = jwt.sign({ _id: '67de52253f76b02053bb1c3e' }, 'VanshChauhan975922');
+            res.cookie("token",token)
             res.send("Login Successfully")
          }
          else{
@@ -141,6 +147,28 @@ app.patch('/user/:userId', async(req,res)=>{
         res.status(404).send(err.message)
    }
 })
+
+app.get('/profile',async(req,res)=>{
+    try{
+          const cookie = req.cookies; 
+          const {token}= cookie;
+          console.log(token);
+         
+          const decoded= jwt.verify(token, 'VanshChauhan975922');
+          const {_id}= decoded
+          console.log(_id)
+
+          const user = await User.findById(_id).exec();
+
+          console.log(user);
+
+          res.send("coookies passed succesfully")
+    }
+    catch(err){
+        res.status(404).send(err.message)
+    }
+})
+
 
 connectDb()
     .then(()=>{
