@@ -3,8 +3,11 @@ const connectDb= require("./config/database")
 const Validation = require("./utils/Validation")
 const cookieParser = require('cookie-parser')   
 const jwt = require('jsonwebtoken');
+const getJWT = require('./models/user')
+const validatedPassword = require("./models/user")
 const bcrypt = require('bcrypt');
-const User= require('./models/user')
+const User= require('./models/user');
+const { profileAuth } = require("./middleWare/Auth");
 const app = express();
 const port = 7777
 
@@ -39,17 +42,18 @@ app.post('/signup', async(req,res)=>{
 
 app.post("/login", async(req,res)=>{
     try{
-         const {email, password} = req.body;
+        const {email, password} = req.body;
 
          const user = await User.findOne({email: email})
          if(!user){
             throw new Error("Invalid Credentials")
          }
          
-         const validPassword =await bcrypt.compare(password, user.password);
+         const validPassword =await user.validatedPassword(password)
+         
 
          if(validPassword){   
-            var token = jwt.sign({ _id: '67de52253f76b02053bb1c3e' }, 'VanshChauhan975922');
+            const token =await user.getJWT()
             res.cookie("token",token)
             res.send("Login Successfully")
          }
@@ -148,25 +152,23 @@ app.patch('/user/:userId', async(req,res)=>{
    }
 })
 
-app.get('/profile',async(req,res)=>{
+app.get('/profile',profileAuth,async(req,res)=>{
     try{
-          const cookie = req.cookies; 
-          const {token}= cookie;
-          console.log(token);
-         
-          const decoded= jwt.verify(token, 'VanshChauhan975922');
-          const {_id}= decoded
-          console.log(_id)
-
-          const user = await User.findById(_id).exec();
-
-          console.log(user);
-
+         console.log(req.user) 
           res.send("coookies passed succesfully")
     }
     catch(err){
         res.status(404).send(err.message)
     }
+})
+
+app.post('/sendConnectionRequest',profileAuth,async(req,res)=>{
+    try{
+         res.send(req.user + "send the connection request")
+   }
+   catch(err){
+       res.status(404).send(err.message)
+   }
 })
 
 
