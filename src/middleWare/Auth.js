@@ -5,7 +5,9 @@ const profileAuth= async (req,res,next)=>{
      try{
              const cookie = req.cookies; 
              const {token}= cookie;
-                     
+             if(!token){
+                throw new Error("Please Login ")
+             }    
              const decoded= jwt.verify(token, 'VanshChauhan975922');
              const {_id}= decoded
 
