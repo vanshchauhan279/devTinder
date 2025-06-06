@@ -6,23 +6,23 @@ const profileAuth= async (req,res,next)=>{
              const cookie = req.cookies; 
              const {token}= cookie;
              if(!token){
-                throw new Error("Please Login ")
-             }    
+               return res.status(401).send("Please Login")
+             }     
              const decoded= jwt.verify(token, 'VanshChauhan975922');
              const {_id}= decoded
 
-             const user = await User.findById(_id).exec();
+             const user = await User.findById(_id).exec();    
              if(!user){
-                throw new Error("user not found")
+                return res.status(401).send("no user")
              }
              req.user= user;
              next()
      }
-     catch(err){
+     catch(err){ 
         res.status(404).send(err.message);
      }
-}
+}  
 
 module.exports={
      profileAuth
-};
+};     

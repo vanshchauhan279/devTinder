@@ -59,7 +59,7 @@ requestRouter.post('/request/review/:status/:requestId', profileAuth, async(req,
          if(!allowedStatus.includes(status)){
             return res.status(400).send("status is not allowed");
          }
-
+ 
          const request = await connectionRequest.findOne({
              _id: requestId,
              toUserId: loggedInUser._id,
@@ -73,7 +73,7 @@ requestRouter.post('/request/review/:status/:requestId', profileAuth, async(req,
 
         const data =await request.save();
 
-         res.json({
+         res.send({
             message: "Connection Request "+ status , data
          })
 

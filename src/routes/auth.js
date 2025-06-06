@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const User= require('../models/user');
 const getJWT = require('../models/user')
 const validatedPassword = require("../models/user")
-
+ 
 authRouter.post('/signup', async(req,res)=>{
     try{
           Validation(req);
@@ -20,8 +20,11 @@ authRouter.post('/signup', async(req,res)=>{
             email,
             password: passwordHash
           })
+         const savedUser =await user.save()
+         const token = await savedUser.getJWT();
+         res.cookie("token",token)
 
-          res.send("user is successfully added")
+          res.send(savedUser)
     }
     catch(err){
 
@@ -40,30 +43,32 @@ authRouter.post("/login", async(req,res)=>{
          if(!user){
             throw new Error("Invalid Credentials")
          }
-         
-         const validPassword =await user.validatedPassword(password)
-         
-
+           
+         const validPassword = await user.validatedPassword(password)
+    
          if(validPassword){   
             const token =await user.getJWT()
             res.cookie("token",token)
-            res.send("Login Successfully")
+            const userObj = user.toObject();
+            delete userObj.password;
+            res.send(userObj);
          }
          else{
             throw new Error("Invalid Credentials")
          }
-
+          
     }
     catch(err){
         res.status(404).send(err.message)
     }
 })
-
+ 
 authRouter.post('/logout',async (req,res)=>{
      res.clearCookie("token",null,{
         expires: new Date(Date.now())
      });
-     res.send("User logged out successfully")
+     res.send("User logged out successfully") 
 })
-
+    
 module.exports = authRouter;
+         

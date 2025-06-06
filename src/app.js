@@ -6,11 +6,26 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user")
+const cors = require('cors')
 
-const app = express();
+const app = express();  
 const port = 7777
 
-app.use(express.json()) //enable json parsing, without this req.body gives undefined
+//enable json parsing, without this req.body gives undefined
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+  
+// Apply CORS globally
+
+// Handle preflight requests for all routes
+
+app.use(express.json()) 
 app.use(cookieParser())
 
 app.use('/',authRouter, profileRouter, requestRouter,userRouter)
@@ -25,6 +40,8 @@ connectDb()
     .catch(()=>{
         console.log("database is not connected")
     })
+ 
 
+  
 
-
+   
