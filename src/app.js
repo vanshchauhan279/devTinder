@@ -11,7 +11,6 @@ const cors = require('cors')
 const app = express();  
 const port = 7777
 
-//enable json parsing, without this req.body gives undefined
 const corsOptions = {
   origin: "http://localhost:5173",
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
@@ -19,11 +18,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-
-  
-// Apply CORS globally
-
-// Handle preflight requests for all routes
 
 app.use(express.json()) 
 app.use(cookieParser())

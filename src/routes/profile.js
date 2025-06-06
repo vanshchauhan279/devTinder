@@ -44,16 +44,6 @@ profileRouter.patch("/edit", profileAuth, async (req, res) => {
   }
 });
 
-// profileRouter.get('/feed',profileAuth,async(req,res)=>{
-//     try{
-//        const users= await User.find({})
-//        res.json(users)
-//     }
-//     catch(err){
-//        res.status(404).send("something went wrong");
-//     }
-// })
-
 profileRouter.patch("/profile/forgotPassword", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
